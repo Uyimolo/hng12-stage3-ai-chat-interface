@@ -19,30 +19,42 @@ const InputArea = ({
   const [text, setText] = useState("");
   const { detectLanguage, error, isReady } = useLangDetection();
 
+  const createNewMessage = useCallback(
+    (text: string): Message => ({
+      id: Date.now().toString() + Math.random().toString(36).slice(2),
+      timestamp: new Date().toString(),
+      userPrompt: text.trim(),
+      detectedLanguage: "",
+      summarizedText: {
+        content: "",
+        timestamp: "",
+      },
+      translatedText: {
+        content: "",
+        timestamp: "",
+      },
+    }),
+    [],
+  );
+
+  const updateMessageLanguage = useCallback(
+    (messages: Message[], messageId: string, language: string): Message[] => {
+      return messages.map((message) =>
+        message.id === messageId
+          ? { ...message, detectedLanguage: language }
+          : message,
+      );
+    },
+    [],
+  );
+
   const sendMessage = useCallback(
     async (text: string, e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       if (!text.trim()) return;
 
-      const id = Math.floor(
-        Number(new Date()) + Math.random() * 1000000,
-      ).toString();
-
-      const newMessage: Message = {
-        id: id,
-        timestamp: new Date().toString(),
-        userPrompt: text.trim(),
-        detectedLanguage: "",
-        summarizedText: {
-          content: "",
-          timestamp: "",
-        },
-        translatedText: {
-          content: "",
-          timestamp: "",
-        },
-      };
+      const newMessage = createNewMessage(text.trim());
 
       setMessages((prevMessages) =>
         prevMessages ? [...prevMessages, newMessage] : [newMessage],
@@ -53,23 +65,19 @@ const InputArea = ({
 
       // detect language and set message state to show language
       try {
-     const detectedLanguage = await detectLanguage(text);
-     const displayLanguage = getLanguageDisplayName(detectedLanguage); // Convert code to display name
+        const detectedLanguage = await detectLanguage(text);
+        const displayLanguage = getLanguageDisplayName(detectedLanguage); // Convert code to display name
 
-     setMessages((prevMessages) =>
-       prevMessages.map((message) =>
-         message.id === id
-           ? { ...message, detectedLanguage: displayLanguage }
-           : message,
-       ),
-     );
+        setMessages((prevMessages) =>
+          updateMessageLanguage(prevMessages, newMessage.id, displayLanguage),
+        );
       } catch (error) {
         console.error("Error detecting language:", error);
         setMessages((prevMessages) =>
-          prevMessages.map((message) =>
-            message.id === id
-              ? { ...message, detectedLanguage: "Error detecting language" }
-              : message,
+          updateMessageLanguage(
+            prevMessages,
+            newMessage.id,
+            "Failed to detect language",
           ),
         );
       }

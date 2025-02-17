@@ -31,7 +31,14 @@ const MessageFeed = ({ messages }: { messages: Message[] }) => {
                   <Button variant="tertiary">Translate</Button>
                 </div>
               </div>
-              <Paragraph>{detectedLanguage}</Paragraph>
+
+              {detectedLanguage && (
+                <div className="">
+                  <Paragraph variant="small" className="text-right">
+                    {detectedLanguage}
+                  </Paragraph>
+                </div>
+              )}
             </div>
 
             {/* ai response */}
