@@ -7,9 +7,9 @@ interface LanguageDetector {
   ): Promise<{ confidence: number; detectedLanguage: string }[]>;
 }
 
-interface LanguageDetectorCapabilities {
-  capabilities: "no" | "readily" | "after-download";
-}
+// interface LanguageDetectorCapabilities {
+//   capabilities: "no" | "readily" | "after-download";
+// }
 
 const useLangDetection = () => {
   const [detector, setDetector] = useState<LanguageDetector | null>(null);
@@ -29,7 +29,7 @@ const useLangDetection = () => {
           await self.ai.languageDetector?.capabilities();
         const canDetect = languageDetectorCapabilities.available;
 
-        console.log("status", canDetect);
+        // console.log("status", canDetect);
 
         if (canDetect === "no") {
           console.log("Language detector is not usable");

@@ -11,25 +11,14 @@ export const scrollToBottom = () => {
       top: document.documentElement.scrollHeight,
       behavior: "smooth",
     });
-  }, 100); // Delay to allow content to render
+  }, 100); 
 };
 
-export const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-};
-
-export const getLanguageDisplayName = (
-  langCode: string,
-  locale: string = "en",
-): string => {
+export const getLanguageDisplayName = (langCode: string, locale: string = "en") => {
   try {
     const displayNames = new Intl.DisplayNames([locale], { type: "language" });
     return displayNames.of(langCode) || langCode;
   } catch (e) {
-    console.error("Error fetching language name:", e);
-    return langCode;
+    return langCode; 
   }
 };

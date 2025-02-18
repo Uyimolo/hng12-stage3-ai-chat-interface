@@ -1,5 +1,5 @@
 import useLangDetection from "@/hooks/useLangDetection";
-import { getLanguageDisplayName, scrollToBottom } from "@/lib/utils";
+import { cn, getLanguageDisplayName, scrollToBottom } from "@/lib/utils";
 import { Message } from "@/types/types";
 import {
   ChangeEvent,
@@ -13,8 +13,10 @@ import { IoMdSend } from "react-icons/io";
 
 const InputArea = ({
   setMessages,
+  messages,
 }: {
   setMessages: Dispatch<SetStateAction<Message[]>>;
+  messages: Message[];
 }) => {
   const [text, setText] = useState("");
   const { detectLanguage, error, isReady } = useLangDetection();
@@ -24,7 +26,10 @@ const InputArea = ({
       id: Date.now().toString() + Math.random().toString(36).slice(2),
       timestamp: new Date().toString(),
       userPrompt: text.trim(),
-      detectedLanguage: "",
+      detectedLanguage: {
+        languageCode: "",
+        name: "",
+      },
       summarizedText: {
         content: "",
         timestamp: "",
@@ -38,10 +43,15 @@ const InputArea = ({
   );
 
   const updateMessageLanguage = useCallback(
-    (messages: Message[], messageId: string, language: string): Message[] => {
+    (
+      messages: Message[],
+      messageId: string,
+      name: string,
+      languageCode: string,
+    ): Message[] => {
       return messages.map((message) =>
         message.id === messageId
-          ? { ...message, detectedLanguage: language }
+          ? { ...message, detectedLanguage: { languageCode, name } }
           : message,
       );
     },
@@ -69,17 +79,15 @@ const InputArea = ({
         const displayLanguage = getLanguageDisplayName(detectedLanguage); // Convert code to display name
 
         setMessages((prevMessages) =>
-          updateMessageLanguage(prevMessages, newMessage.id, displayLanguage),
-        );
-      } catch (error) {
-        console.error("Error detecting language:", error);
-        setMessages((prevMessages) =>
           updateMessageLanguage(
             prevMessages,
             newMessage.id,
-            "Failed to detect language",
+            displayLanguage,
+            detectedLanguage,
           ),
         );
+      } catch (error) {
+        console.error("Error detecting language:", error);
       }
     },
     [detectLanguage, setMessages],
@@ -90,19 +98,20 @@ const InputArea = ({
   }, []);
 
   if (!isReady) {
-    // You might want to show a loading state or disable the input
     console.log("Language detector is initializing...");
   }
 
   if (error) {
-    // You might want to show an error state
     console.error("Language detector error:", error);
   }
 
   return (
     <form
       onSubmit={(e) => sendMessage(text, e)}
-      className="fixed bottom-4 left-1/2 h-32 w-4/5 max-w-[700px] -translate-x-1/2 rounded-3xl border border-lightblue bg-white shadow"
+      className={cn(
+        "fixed bottom-4 left-1/2 h-32 w-4/5 max-w-[700px] -translate-x-1/2 rounded-3xl border bg-white shadow-lg transition-all duration-500",
+        !messages.length && "top-1/2 -translate-y-1/2",
+      )}
     >
       <textarea
         name="prompt-input"
@@ -115,7 +124,7 @@ const InputArea = ({
             : "Initializing language detector..."
         }
         disabled={!isReady}
-        className="mx-auto h-24 w-[calc(100%-20px)] resize-none rounded-3xl p-3 placeholder:text-sm focus:outline-none disabled:bg-gray-100"
+        className="mx-auto h-24 w-[calc(100%-20px)] resize-none rounded-3xl p-3 placeholder:text-sm focus:outline-none disabled:bg-gray-100 text-sm"
       ></textarea>
       <div className="absolute bottom-0 flex h-8 w-full items-center justify-between px-4 pb-2">
         <div className="">

@@ -2,7 +2,10 @@ export type Message = {
   id: string;
   timestamp: string;
   userPrompt: string;
-  detectedLanguage: string;
+  detectedLanguage: {
+    languageCode: string;
+    name: string;
+  };
   summarizedText: Summary;
   translatedText: Translation;
 };
@@ -14,5 +17,6 @@ type Summary = {
 
 type Translation = {
   content: string;
+  error?: string;
   timestamp: string;
 };
