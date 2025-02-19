@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { BsTranslate } from "react-icons/bs";
+import { FaUser } from "react-icons/fa";
 
 type Language = {
   label: string;
@@ -91,47 +92,53 @@ const Message = ({
     );
   };
   return (
-    <div className="jusitify-end flex flex-col gap-6">
-      <div className="flex gap-2 self-end">
-        <FaTrash
-          className="w-fit cursor-pointer justify-end text-right text-sm text-lightblue"
-          onClick={() => removeMessage(id)}
-        />
-        <div className="self-end">
-          <div className="xs:max-w-[330px] w-fit max-w-[280px] space-y-4 rounded-xl border bg-lightergray p-2 transition duration-300 hover:border-lightblue md:max-w-[500px]">
+    <div className="jusitify-end flex flex-col gap-6 px-4 lg:px-12">
+      <div className="flex w-full gap-1 self-end">
+        <div className="order-2 grid aspect-square w-4 place-content-center self-start rounded-full border border-blue sm:w-8">
+          <FaUser
+            className="borde w-fit cursor-pointer justify-end rounded-full border-blue text-right text-sm leading-none text-lightblue sm:text-xl"
+            onClick={() => removeMessage(id)}
+          />
+        </div>
+
+        {/* User Message */}
+        <div className="flex w-full flex-col">
+          <div className="w-full space-y-4 self-end rounded-xl border bg-lightergray p-2 transition duration-300 hover:border-lightblue sm:w-3/5 md:max-w-[500px]">
             <Paragraph>{userPrompt}</Paragraph>
-            <div className="flex w-full items-center justify-end gap-2 self-end">
+
+            {/* actions */}
+            <div className="justify-en flex w-full flex-wrap items-center gap-1 self-end">
               {userPrompt.trim().length > 150 &&
                 detectedLanguage.name.toLowerCase() === "english" && (
                   <Button variant="tertiary">Summarize</Button>
                 )}
 
-              <div className="flex items-center gap-2">
-                <Button variant="tertiary" onClick={() => handleTranslation()}>
-                  Translate
-                </Button>
+              {/* <div className="flex items-center gap-1"> */}
+              <Button variant="tertiary" onClick={() => handleTranslation()}>
+                Translate
+              </Button>
 
-                <Select
-                  onValueChange={(selectedLanguage) =>
-                    handleLanguageChange(selectedLanguage)
-                  }
-                >
-                  <SelectTrigger className="flex w-full min-w-40 items-center gap-1 hover:text-white border-lightblue bg-white text-xs text-lightblue hover:bg-lighterblue focus:border-white">
-                    <BsTranslate className="text-xl" />
-                    <SelectValue
-                      placeholder={`${languageOptions[0].label}`}
-                      //   defaultValue={languageOptions[0].value}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {languageOptions.map((language, index) => (
-                      <SelectItem key={index + 1} value={language.value}>
-                        {language.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select
+                onValueChange={(selectedLanguage) =>
+                  handleLanguageChange(selectedLanguage)
+                }
+              >
+                <SelectTrigger className="flex w-fit min-w-28 items-center gap-1 border-lightblue bg-white p-1 text-xs text-lightblue hover:bg-lighterblue hover:text-white focus:border-white">
+                  <BsTranslate className="text-sm" />
+                  <SelectValue
+                    placeholder={`${languageOptions[0].label}`}
+                    //   defaultValue={languageOptions[0].value}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {languageOptions.map((language, index) => (
+                    <SelectItem key={index + 1} value={language.value}>
+                      {language.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {/* </div> */}
             </div>
           </div>
           {detectedLanguage && (
@@ -142,20 +149,21 @@ const Message = ({
             </div>
           )}
         </div>
-          </div>
-          
-          {/* Ai responses */}
-      <div className="space-y-4">
+      </div>
+
+      {/* Ai responses */}
+      <div className="w-full space-y-4">
         {summarizedText.content && (
-          <div className="xs:max-w-[330px] w-fit max-w-[300px] space-y-1 self-start rounded-xl border bg-lighterblue/30 p-2 transition duration-300 hover:border-lightblue md:max-w-[500px]">
+          <div className="w-full space-y-1 self-start rounded-xl border bg-lighterblue/30 p-2 transition duration-300 hover:border-lightblue md:max-w-[500px]">
             <Paragraph>{`Sure here's your summarized text`}</Paragraph>
             <Paragraph>{summarizedText.content}</Paragraph>
           </div>
         )}
         {translatedText.content && (
-          <div className="xs:max-w-[330px] w-fit max-w-[300px] space-y-1 self-start rounded-xl border p-2 transition duration-300 hover:border-lightblue md:max-w-[500px]">
+          <div className="w-full space-y-1 self-start rounded-xl border bg-lighterblue/30 p-2 transition duration-300 hover:border-lightblue md:max-w-[500px]">
             <Paragraph>{`Sure here's your translated text.`}</Paragraph>
             <Paragraph>{translatedText.content}</Paragraph>
+            {/* todo: add confidence score */}
           </div>
         )}
         {translatedText.error && (

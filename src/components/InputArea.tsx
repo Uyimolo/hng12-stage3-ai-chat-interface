@@ -109,7 +109,7 @@ const InputArea = ({
     <form
       onSubmit={(e) => sendMessage(text, e)}
       className={cn(
-        "fixed bottom-4 left-1/2 h-32 w-4/5 max-w-[700px] -translate-x-1/2 rounded-3xl border bg-white shadow-lg transition-all duration-500",
+        "fixed bottom-4 left-1/2 h-32 w-full md:w-4/5 max-w-[718px] -translate-x-1/2 rounded-3xl border bg-white shadow-lg transition-all duration-500",
         !messages.length && "top-1/2 -translate-y-1/2",
       )}
     >

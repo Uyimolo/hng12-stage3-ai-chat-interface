@@ -19,10 +19,21 @@ const ChatInterface = () => {
     console.log("translator status: working");
   }
 
+  if ("ai" in self && "summarizer" in self.ai) {
+    // The Summarizer API is supported.
+    console.log("summarizer status: working");
+    const summarizer = async () => {
+      const available = await window.ai.summarizer.capabilities();
+      console.log("summerizer:", available);
+    };
+
+    summarizer();
+  }
+
   return (
-    <div className="relative px-4 py-2 lg:px-12 lg:py-2">
+    <div className="relative h-screen py-2 lg:py-2">
       <Header />
-      <div className="">
+      <div className="h-[calc(100vh-140px)] bg-blac overflow-y-scroll">
         <MessageFeed setMessages={setMessages} messages={messages} />
       </div>
       <InputArea messages={messages} setMessages={setMessages} />

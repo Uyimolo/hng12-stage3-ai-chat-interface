@@ -14,7 +14,7 @@ const MessageFeed = ({
   setMessages: Dispatch<SetStateAction<MessageType[]>>;
 }) => {
   return (
-    <div className="mx-auto max-w-[1000px] space-y-6 pb-40 pt-20 lg:px-12">
+    <div className="mx-auto max-w-[800px] space-y-6 pb-40 pt-20">
       {messages?.map((message) => (
         <Message key={message.id} message={message} setMessages={setMessages} />
       ))}
