@@ -1,22 +1,15 @@
 import useLangDetection from "@/hooks/useLangDetection";
 import { cn, getLanguageDisplayName, scrollToBottom } from "@/lib/utils";
 import { Message } from "@/types/types";
-import {
-  ChangeEvent,
-  Dispatch,
-  FormEvent,
-  SetStateAction,
-  useState,
-  useCallback,
-} from "react";
+import { ChangeEvent, FormEvent, useState, useCallback } from "react";
 import { IoMdSend } from "react-icons/io";
 
 const InputArea = ({
   setMessages,
   messages,
 }: {
-  setMessages: Dispatch<SetStateAction<Message[]>>;
   messages: Message[];
+  setMessages: (newMessages: Message[]) => void;
 }) => {
   const [text, setText] = useState("");
   const { detectLanguage, error, isReady } = useLangDetection();
@@ -34,22 +27,20 @@ const InputArea = ({
         content: "",
         timestamp: "",
       },
-      translatedText: {
-        content: "",
-        timestamp: "",
-      },
+      edited: false,
+      translations: [],
     }),
     [],
   );
 
   const updateMessageLanguage = useCallback(
     (
-      messages: Message[],
+      allMessages: Message[],
       messageId: string,
       name: string,
       languageCode: string,
     ): Message[] => {
-      return messages.map((message) =>
+      return allMessages.map((message) =>
         message.id === messageId
           ? { ...message, detectedLanguage: { languageCode, name } }
           : message,
@@ -66,50 +57,44 @@ const InputArea = ({
 
       const newMessage = createNewMessage(text.trim());
 
-      setMessages((prevMessages) =>
-        prevMessages ? [...prevMessages, newMessage] : [newMessage],
-      );
+      // Create new messages array with the new message
+      const updatedMessages = messages
+        ? [...messages, newMessage]
+        : [newMessage];
+      setMessages(updatedMessages);
 
       scrollToBottom();
       setText("");
 
-      // detect language and set message state to show language
+      // Detect language and update messages array
       try {
         const detectedLanguage = await detectLanguage(text);
-        const displayLanguage = getLanguageDisplayName(detectedLanguage); // Convert code to display name
+        const displayLanguage = getLanguageDisplayName(detectedLanguage);
 
-        setMessages((prevMessages) =>
-          updateMessageLanguage(
-            prevMessages,
-            newMessage.id,
-            displayLanguage,
-            detectedLanguage,
-          ),
+        const messagesWithLanguage = updateMessageLanguage(
+          updatedMessages,
+          newMessage.id,
+          displayLanguage,
+          detectedLanguage,
         );
+
+        setMessages(messagesWithLanguage);
       } catch (error) {
         console.error("Error detecting language:", error);
       }
     },
-    [detectLanguage, setMessages],
+    [detectLanguage, setMessages, messages],
   );
 
   const handleChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
   }, []);
 
-  if (!isReady) {
-    console.log("Language detector is initializing...");
-  }
-
-  if (error) {
-    console.error("Language detector error:", error);
-  }
-
   return (
     <form
       onSubmit={(e) => sendMessage(text, e)}
       className={cn(
-        "fixed bottom-4 left-1/2 h-32 w-full md:w-4/5 max-w-[718px] -translate-x-1/2 rounded-3xl border bg-white shadow-lg transition-all duration-500",
+        "absolute bottom-4 left-1/2 h-32 w-[calc(100vw-32px)] max-w-[718px] -translate-x-1/2 rounded-3xl border border-lightgray bg-white p-4 shadow-lg shadow-black/30 transition-all duration-500 md:w-4/5",
         !messages.length && "top-1/2 -translate-y-1/2",
       )}
     >
@@ -124,9 +109,11 @@ const InputArea = ({
             : "Initializing language detector..."
         }
         disabled={!isReady}
-        className="mx-auto h-24 w-[calc(100%-20px)] resize-none rounded-3xl p-3 placeholder:text-sm focus:outline-none disabled:bg-gray-100 text-sm"
+        className="mx-auto h-24 w-[calc(100%-20px)] resize-none rounded text-sm placeholder:text-sm focus:outline-none disabled:bg-transparent"
       ></textarea>
-      <div className="absolute bottom-0 flex h-8 w-full items-center justify-between px-4 pb-2">
+
+      {/* actions */}
+      <div className="absolute bottom-0 flex h-8 w-full items-center justify-between px-4 pb-2 pr-8">
         <div className="">
           {error && (
             <span className="text-red-500 text-sm">Error: {error}</span>

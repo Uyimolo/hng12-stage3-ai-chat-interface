@@ -19,7 +19,7 @@ const useTranslator = () => {
       try {
         // Detect source language
           const sourceLanguage = await detectLanguage(text);
-          console.log('detected lang', sourceLanguage)
+          // console.log('detected lang', sourceLanguage)
 
         // Check capabilities
         const capabilities = await window.ai.translator.capabilities();

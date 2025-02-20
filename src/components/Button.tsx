@@ -33,7 +33,7 @@ const Button = ({
     ghost: "bg-transparent hover:bg-lighterBlue hover:text-lightgray",
     danger: "border-red border text-red hover:bg-red/20 bg-red/10",
     tertiary:
-      "bg-white disabled:bg-lightgray/50  hover:bg-lighterblue border-[1px] border-lightblue hover:text-white text-blue hover:light disabled:text-lighterblue px-2 py-2 text-xs font-normal",
+      "bg-white disabled:bg-lightgray/50  hover:bg-lighterblue border-[1px] border-lightblue hover:text-white text-blue disabled:text-lighterblue px-2 py-2 text-xs font-normal",
   };
 
   // Default to 'danger' if the variant doesn't match any of the above

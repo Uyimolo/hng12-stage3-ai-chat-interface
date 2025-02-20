@@ -6,8 +6,9 @@ export type Message = {
     languageCode: string;
     name: string;
   };
-  summarizedText: Summary;
-  translatedText: Translation;
+  summarizedText: Summary | null;
+  translations: Translation[]; // Store multiple translations
+  edited: boolean; // Track if userPrompt was edited
 };
 
 type Summary = {
@@ -15,8 +16,11 @@ type Summary = {
   timestamp: string;
 };
 
-type Translation = {
+export type Translation = {
+  language: string;
   content: string;
   error?: string;
   timestamp: string;
 };
+
+export type chatType = { id: string; name: string; messages: Message[] };
