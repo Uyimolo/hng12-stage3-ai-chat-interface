@@ -1,4 +1,3 @@
-import { FaTrash } from "react-icons/fa6";
 import { BsTranslate } from "react-icons/bs";
 import Paragraph from "./Paragraph";
 import Button from "./Button";
