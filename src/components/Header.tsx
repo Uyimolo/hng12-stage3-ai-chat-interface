@@ -18,7 +18,7 @@ const Header = ({
           className="grid aspect-square w-6 cursor-pointer place-content-center rounded-sm bg-lightergray transition duration-300 hover:bg-lightergray lg:hidden lg:w-12 lg:rounded-xl"
           onClick={() => setShowSidebar(true)}
         >
-          <HiOutlineMenuAlt2 className="text-lightgray" />
+          <HiOutlineMenuAlt2 className="text-lightgray text-xl" />
         </button>
 
         <Paragraph className="text-xl font-semibold lg:text-2xl">
