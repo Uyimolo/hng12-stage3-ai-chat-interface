@@ -70,7 +70,7 @@ const SidebarChatLabel = ({
               className=""
               onClick={(e) => e.stopPropagation()}
             >
-              <VscKebabVertical className="dark:text-white" />
+              <VscKebabVertical className={cn("dark:text-white", activeChatId === chat.id && "text-white")} />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="text-sm dark:bg-lightBackground">
               <DropdownMenuLabel className="text-sm dark:text-textLight">
