@@ -14,11 +14,10 @@ const useTheme = () => {
       }
       return savedTheme;
     }
-    return "light"; // Default theme
+    return "light";
   });
 
   useEffect(() => {
-    // Update document root class and localStorage when theme changes
     if (typeof window !== "undefined") {
       const root = window.document.documentElement;
       root.classList.remove("light", "dark");
@@ -27,12 +26,10 @@ const useTheme = () => {
     }
   }, [theme]);
 
-  // Toggle between light and dark themes
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
-  // Set a specific theme
   const setSpecificTheme = (newTheme: "light" | "dark") => {
     setTheme(newTheme);
   };
