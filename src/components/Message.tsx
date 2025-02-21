@@ -157,6 +157,7 @@ const Message = ({
     );
     if (existingTranslation && existingTranslation.content !== "Error") {
       console.log("Using existing translation");
+      toast.info("Translation already exists");
       return; // Translation already exists, no need to make API call
     }
 
