@@ -217,24 +217,28 @@ const Message = ({
     <div className="flex flex-col gap-6 px-4 lg:px-12">
       {/* User Message */}
       <div className="group flex w-[95%] items-start justify-end gap-1 self-end md:gap-2">
-        <button
-          className="lg:hidden lg:group-hover:block"
-          onClick={() => removeMessage(id)}
-        >
-          <FaTrash className="justify-self-end text-sm text-white" />
-        </button>
-        <div className="hover:border-lighterblue w-full max-w-[400px] justify-self-end rounded-xl border border-transparent bg-darkbackground/10 p-2 dark:bg-lightBackground/10">
-          <Paragraph className="text-darkgray">{userPrompt}</Paragraph>
-          <div className="flex justify-end">
-            {detectedLanguage && (
-              <Paragraph
-                variant="small"
-                className="text-lightblue mt-2 text-right"
-              >
-                Language: {detectedLanguage.name}
-              </Paragraph>
-            )}
-          </div>
+        <div className="relative w-full max-w-[400px] justify-self-end rounded-xl border border-transparent bg-darkbackground/10 p-2 dark:bg-lightBackground/10">
+  {/* Delete Icon - Top Right */}
+  <button
+    className="absolute right-2 top-2 text-white hover:text-red-500"
+    onClick={() => removeMessage(id)}
+    aria-label="Delete message"
+  >
+    <FaTrash className="text-sm" />
+  </button>
+
+  <Paragraph className="text-darkgray">{userPrompt}</Paragraph>
+  <div className="flex justify-end">
+    {detectedLanguage && (
+      <Paragraph
+        variant="small"
+        className="text-lightblue mt-2 text-right"
+      >
+        Language: {detectedLanguage.name}
+      </Paragraph>
+    )}
+  </div>
+</div>
 
           {/* Actions */}
           <div className="flex w-full flex-wrap items-center gap-1 pt-2">
