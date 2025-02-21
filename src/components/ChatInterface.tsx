@@ -5,6 +5,7 @@ import InputArea from "./InputArea";
 import MessageFeed from "./MessageFeed";
 import { chatType, Message } from "@/types/types";
 import Sidebar from "./Sidebar";
+import { v4 as uuidv4 } from "uuid";
 
 const ChatInterface = () => {
   const [chats, setChats] = useState<chatType[]>([]);
@@ -24,7 +25,7 @@ const ChatInterface = () => {
         setActiveChatId(savedActiveChatId || parsedChats[0]?.id || null);
       } else {
         const defaultChat = [
-          { id: crypto.randomUUID(), name: "New Chat", messages: [] },
+          { id: uuidv4(), name: "Conversation 1", messages: [] },
         ];
         setChats(defaultChat);
         setActiveChatId(defaultChat[0].id);
@@ -46,7 +47,7 @@ const ChatInterface = () => {
 
   const createNewChat = () => {
     const newChat = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       name: `Conversation ${chats.length + 1}`,
       messages: [],
     };
@@ -73,7 +74,7 @@ const ChatInterface = () => {
   const deleteChat = (chatId: string) => {
     if (chats.length === 1) {
       const defaultChat = {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         name: "Chat 1",
         messages: [],
       };

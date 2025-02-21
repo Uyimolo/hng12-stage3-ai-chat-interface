@@ -218,27 +218,27 @@ const Message = ({
       {/* User Message */}
       <div className="group flex w-[95%] items-start justify-end gap-1 self-end md:gap-2">
         <div className="relative w-full max-w-[400px] justify-self-end rounded-xl border border-transparent bg-darkbackground/10 p-2 dark:bg-lightBackground/10">
-  {/* Delete Icon - Top Right */}
-  <button
-    className="absolute right-2 top-2 text-white hover:text-red-500"
-    onClick={() => removeMessage(id)}
-    aria-label="Delete message"
-  >
-    <FaTrash className="text-sm" />
-  </button>
+          {/* Delete Icon - Top Right */}
+          {/* <button
+            className="hover:text-red-500 absolute -right-6 top-2 text-white"
+            onClick={() => removeMessage(id)}
+            aria-label="Delete message"
+          >
+            <FaTrash className="text-sm" />
+          </button> */}
 
-  <Paragraph className="text-darkgray">{userPrompt}</Paragraph>
-  <div className="flex justify-end">
-    {detectedLanguage && (
-      <Paragraph
-        variant="small"
-        className="text-lightblue mt-2 text-right"
-      >
-        Language: {detectedLanguage.name}
-      </Paragraph>
-    )}
-  </div>
-</div>
+          <Paragraph className="text-darkgray">{userPrompt}</Paragraph>
+          <div className="flex justify-end">
+            {detectedLanguage && (
+              <Paragraph
+                variant="small"
+                className="text-lightblue mt-2 text-right"
+              >
+                Language: {detectedLanguage.name}
+              </Paragraph>
+            )}
+          </div>
+          {/* </div> */}
 
           {/* Actions */}
           <div className="flex w-full flex-wrap items-center gap-1 pt-2">
@@ -266,6 +266,10 @@ const Message = ({
                 ))}
               </SelectContent>
             </Select>
+
+            <Button variant="tertiary" onClick={() => removeMessage(id)}>
+              Delete
+            </Button>
           </div>
         </div>
       </div>
@@ -282,21 +286,23 @@ const Message = ({
           </div>
         )}
         {translations
-  .filter(
-    (translation) =>
-      translation.content !== "Error" &&
-      translation.content !== "Translation failed"
-  )
-  .map((translation, index) => (
-    <div
-      ref={index === translations.length - 1 ? lastTransRef : null}
-      key={index}
-      className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/20 p-2 dark:bg-lightBackground/20"
-    >
-      <Paragraph>{`Sure, here's your translation in ${getLanguageDisplayName(translation.language)}:`}</Paragraph>
-      <Paragraph className="text-darkgray">{translation.content}</Paragraph>
-    </div>
-  ))}
+          .filter(
+            (translation) =>
+              translation.content !== "Error" &&
+              translation.content !== "Translation failed",
+          )
+          .map((translation, index) => (
+            <div
+              ref={index === translations.length - 1 ? lastTransRef : null}
+              key={index}
+              className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/20 p-2 dark:bg-lightBackground/20"
+            >
+              <Paragraph>{`Sure, here's your translation in ${getLanguageDisplayName(translation.language)}:`}</Paragraph>
+              <Paragraph className="text-darkgray">
+                {translation.content}
+              </Paragraph>
+            </div>
+          ))}
       </div>
     </div>
   );
