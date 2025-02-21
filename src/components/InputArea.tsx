@@ -14,7 +14,7 @@ const InputArea = ({
   setShouldScroll: (shouldScroll: boolean) => void;
 }) => {
   const [text, setText] = useState("");
-  const { detectLanguage, error, isReady } = useLangDetection();
+  const { detectLanguage, isReady } = useLangDetection();
 
   const createNewMessage = useCallback(
     (text: string): Message => ({
@@ -100,7 +100,7 @@ const InputArea = ({
     <form
       onSubmit={(e) => sendMessage(text, e)}
       className={cn(
-        "absolute bottom-4 left-1/2 h-28 w-[calc(100vw-32px)] max-w-[718px] -translate-x-1/2 rounded-3xl border border-lightgray bg-white p-4 shadow-lg shadow-black/30 transition-all duration-500 md:w-4/5 xl:max-w-[980px]",
+        "border-lightgray absolute bottom-4 left-1/2 h-28 w-[calc(100vw-32px)] max-w-[718px] -translate-x-1/2 rounded-3xl border bg-white p-4 shadow-lg shadow-black/30 transition-all duration-500 md:w-4/5 xl:max-w-[980px]",
         !messages.length && "top-1/2 -translate-y-1/2",
       )}
     >
@@ -115,15 +115,15 @@ const InputArea = ({
             : "Initializing language detector..."
         }
         disabled={!isReady}
-        className="text-textLight mx-auto h-20 w-[calc(100%-24px)] resize-none rounded text-sm placeholder:text-sm focus:outline-none disabled:bg-transparent"
+        className="mx-auto h-20 w-[calc(100%-24px)] resize-none rounded text-sm text-textLight placeholder:text-sm focus:outline-none disabled:bg-transparent"
       ></textarea>
 
       {/* actions */}
       <div className="absolute bottom-0 flex h-8 w-full items-center justify-between px-4 pb-2 pr-8">
         <div className="">
-          {error && (
+          {/* {error && (
             <span className="text-red-500 text-sm">Error: {error}</span>
-          )}
+          )} */}
         </div>
         <button className="" disabled={!isReady || !text.trim()}>
           <IoMdSend
