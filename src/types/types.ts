@@ -14,6 +14,7 @@ export type Message = {
 type Summary = {
   content: string;
   timestamp: string;
+  error?: string;
 };
 
 export type Translation = {

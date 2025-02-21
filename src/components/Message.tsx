@@ -203,8 +203,9 @@ const Message = ({
         ? {
             ...msg,
             summarizedText: {
-              content: summary.content || summary.error,
+              content: summary.content || "",
               timestamp: new Date().toISOString(),
+              error: summary.error || "",
             },
           }
         : msg,
