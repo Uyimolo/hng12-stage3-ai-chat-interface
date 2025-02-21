@@ -32,11 +32,11 @@ const Header = ({
         {/* theme toggle */}
         {theme === "dark" ? (
           <button>
-            <FaSun className="" />
+            <FaSun className="text-xl" />
           </button>
         ) : (
           <button>
-            <FaMoon className="dark:text-primaryText" />
+            <FaMoon className="dark:text-primaryText text-xl" />
           </button>
         )}
       </div>
