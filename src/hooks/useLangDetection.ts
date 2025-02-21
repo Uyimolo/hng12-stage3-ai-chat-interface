@@ -45,7 +45,8 @@ const useLangDetection = () => {
           capabilities.available === "after-download"
             ? {
                 monitor(m: EventTarget) {
-                  m.addEventListener("downloadprogress", (e: any) => {
+                  m.addEventListener("downloadprogress", (e) => {
+                    //@ts-expect-error couldnt get types
                     console.log(`Downloading: ${e.loaded} / ${e.total} bytes.`);
                   });
                 },
