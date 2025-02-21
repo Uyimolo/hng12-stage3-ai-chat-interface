@@ -277,19 +277,22 @@ const Message = ({
             <Paragraph>{summarizedText.content}</Paragraph>
           </div>
         )}
-        {translations.length > 0 &&
-          translations.map((translation, index) => (
-            <div
-              ref={index === translations.length - 1 ? lastTransRef : null}
-              key={index}
-              className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/20 p-2 dark:bg-lightBackground/20"
-            >
-              <Paragraph>{`Sure here's your translation in ${getLanguageDisplayName(translation.language)}:`}</Paragraph>
-              <Paragraph className="text-darkgray">
-                {translation.content}
-              </Paragraph>
-            </div>
-          ))}
+        {translations
+  .filter(
+    (translation) =>
+      translation.content !== "Error" &&
+      translation.content !== "Translation failed"
+  )
+  .map((translation, index) => (
+    <div
+      ref={index === translations.length - 1 ? lastTransRef : null}
+      key={index}
+      className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/20 p-2 dark:bg-lightBackground/20"
+    >
+      <Paragraph>{`Sure, here's your translation in ${getLanguageDisplayName(translation.language)}:`}</Paragraph>
+      <Paragraph className="text-darkgray">{translation.content}</Paragraph>
+    </div>
+  ))}
       </div>
     </div>
   );
