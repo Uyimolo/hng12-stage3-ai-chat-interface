@@ -18,9 +18,10 @@ const ChatInterface = () => {
 
   const [shouldScroll, setShouldScroll] = useState(true);
 
-
   useEffect(() => {
-    localStorage.setItem("chats", JSON.stringify(chats));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("chats", JSON.stringify(chats));
+    }
   }, [chats]);
 
   // const [activeChatId, setActiveChatId] = useState(chats[0].id);
@@ -87,10 +88,8 @@ const ChatInterface = () => {
     }
   };
 
-  
-
   return (
-    <div className="dark:bg-darkbackground relative h-screen bg-lightBackground lg:grid lg:grid-cols-[300px,1fr]">
+    <div className="relative h-screen bg-lightBackground dark:bg-darkbackground lg:grid lg:grid-cols-[300px,1fr]">
       <Sidebar
         activeChatId={activeChatId}
         chats={chats}
