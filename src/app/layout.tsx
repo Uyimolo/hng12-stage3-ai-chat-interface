@@ -17,11 +17,24 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Ensure the tokens are injected correctly */}
+        <meta
+          httpEquiv="origin-trial"
+          content={process.env.NEXT_PUBLIC_TRANSLATOR_API ?? ""}
+        />
+        <meta
+          httpEquiv="origin-trial"
+          content={process.env.NEXT_PUBLIC_SUMMARIZER_API ?? ""}
+        />
+        <meta
+          httpEquiv="origin-trial"
+          content={process.env.NEXT_PUBLIC_LANGUAGE_DETECTION_API ?? ""}
+        />
+      </head>
       <body className={`${montserrat.className} antialiased`}>
         <main>{children}</main>
         <Toaster />

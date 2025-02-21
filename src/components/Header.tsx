@@ -11,11 +11,11 @@ const Header = ({
 }) => {
   const { theme, toggleTheme } = useTheme();
   return (
-    <div className="dark:bg-darkbackground absolute left-1/2 top-0 flex w-full -translate-x-1/2 items-center justify-between border-b bg-lightBackground px-4 py-2 lg:px-12">
+    <div className="absolute left-1/2 top-0 z-10 flex w-full -translate-x-1/2 items-center justify-between border-b bg-lightBackground px-4 py-2 dark:bg-darkbackground lg:px-12">
       {/* logo */}
       <div className="flex items-center gap-4">
         <button
-          className="grid aspect-square w-6 cursor-pointer place-content-center rounded-sm bg-lightergray transition duration-300 hover:bg-lightergray lg:hidden lg:w-12 lg:rounded-xl"
+          className="bg-lightergray hover:bg-lightergray grid aspect-square w-6 cursor-pointer place-content-center rounded-sm transition duration-300 lg:hidden lg:w-12 lg:rounded-xl"
           onClick={() => setShowSidebar(true)}
         >
           <HiOutlineMenuAlt2 className="text-lightgray text-xl" />
