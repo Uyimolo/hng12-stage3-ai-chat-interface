@@ -10,21 +10,21 @@ const useSummarizer = () => {
   const [isInitializing, setIsInitializing] = useState(false);
 
   const initializeSummarizer = useCallback(async () => {
-    //@ts-ignore
+    //@ts-expect-error
     if (typeof window === "undefined" || !window.ai?.summarizer) {
       toast.error("Summarizer API is unavailable.");
       throw new Error("Summarizer API is not available");
     }
 
     try {
-      //@ts-ignore
+      //@ts-expect-error
       const capabilities = await window.ai.summarizer.capabilities();
       if (capabilities.available === "no") {
         toast.error("Summarizer is not available on this device.");
         throw new Error("Summarizer is not available on this device");
       }
 
-      //@ts-ignore
+      //@ts-expect-error
       const summarizerInstance = await window.ai.summarizer.create({
         type: "key-points",
         format: "markdown",

@@ -12,7 +12,7 @@ const useTranslator = () => {
 
   const translate = useCallback(
     async (text: string, targetLanguage: string): Promise<TranslatorResult> => {
-      //@ts-ignore
+      //@ts-expect-error
       if (typeof window === "undefined" || !window.ai?.translator) {
         toast.error("Translation API is unavailable.");
         return { content: "", error: "Translator API is not available" };
@@ -20,7 +20,7 @@ const useTranslator = () => {
 
       try {
         const sourceLanguage = await detectLanguage(text);
-        //@ts-ignore
+        //@ts-expect-error
         const capabilities = await window.ai.translator.capabilities();
         const available = await capabilities.languagePairAvailable(
           sourceLanguage,
@@ -37,7 +37,7 @@ const useTranslator = () => {
           };
         }
 
-        //@ts-ignore
+        //@ts-expect-error
         const translatorInstance = await window.ai.translator.create({
           sourceLanguage,
           targetLanguage,
