@@ -1,8 +1,8 @@
-import { cn } from '@/lib/utils';
-import { CSSProperties, ReactNode } from 'react';
+import { cn } from "@/lib/utils";
+import { CSSProperties, ReactNode } from "react";
 
 type ParagraphProps = {
-  variant?: 'base' | 'small';
+  variant?: "base" | "small";
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
@@ -14,17 +14,18 @@ const Paragraph = ({
   onClick,
   style,
   children,
-  variant = 'base',
+  variant = "base",
 }: ParagraphProps) => {
   return (
     <p
       className={cn(
-        'text-gray dark:text-white',
-        variant === 'small' ? 'text-xs' : 'text-sm',
-        className
+        "text-textLight dark:text-textPrimary",
+        variant === "small" ? "text-xs" : "text-sm",
+        className,
       )}
       onClick={onClick}
-      style={style}>
+      style={style}
+    >
       {children}
     </p>
   );

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface LanguageDetector {
   ready: Promise<void>;
@@ -7,54 +8,59 @@ interface LanguageDetector {
   ): Promise<{ confidence: number; detectedLanguage: string }[]>;
 }
 
-// interface LanguageDetectorCapabilities {
-//   capabilities: "no" | "readily" | "after-download";
-// }
+declare global {
+  interface Window {
+    ai?: {
+      languageDetector?: {
+        capabilities(): Promise<{
+          available: "no" | "readily" | "after-download";
+        }>;
+        create(options?: {
+          monitor: (monitor: EventTarget) => void;
+        }): Promise<LanguageDetector>;
+      };
+    };
+  }
+}
 
 const useLangDetection = () => {
   const [detector, setDetector] = useState<LanguageDetector | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // Initialize the detector
   useEffect(() => {
     const initializeLanguageDetector = async () => {
-      // Prevent multiple initialization attempts
       if (isInitializing || detector) return;
+      if (typeof window === "undefined" || !window.ai?.languageDetector) {
+        toast.error("Language detection is unavailable.");
+        return;
+      }
 
       setIsInitializing(true);
 
       try {
-        const languageDetectorCapabilities =
-          await self.ai.languageDetector?.capabilities();
-        const canDetect = languageDetectorCapabilities.available;
+        const capabilities = await window.ai.languageDetector.capabilities();
+        if (capabilities.available === "no") return;
 
-        // console.log("status", canDetect);
+        const detectorInstance = await window.ai.languageDetector.create(
+          capabilities.available === "after-download"
+            ? {
+                monitor(m: EventTarget) {
+                  m.addEventListener("downloadprogress", (e: any) => {
+                    console.log(`Downloading: ${e.loaded} / ${e.total} bytes.`);
+                  });
+                },
+              }
+            : undefined,
+        );
 
-        if (canDetect === "no") {
-          console.log("Language detector is not usable");
-          setIsInitializing(false);
-          return;
-        }
-
-        let detectorInstance;
-        if (canDetect === "readily") {
-          detectorInstance = await self.ai.languageDetector.create();
-        } else if (canDetect === "after-download") {
-          detectorInstance = await self.ai.languageDetector.create({
-            monitor(m: EventTarget) {
-              m.addEventListener("downloadprogress", (e: any) => {
-                console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
-              });
-            },
-          });
+        if (capabilities.available === "after-download") {
           await detectorInstance.ready;
         }
 
         setDetector(detectorInstance);
-        // console.log(detectorInstance);
-      } catch (error) {
-        console.error("Error initializing language detector:", error);
+      } catch (err) {
+        toast.error("Failed to initialize language detection.");
+        console.log(err);
       } finally {
         setIsInitializing(false);
       }
@@ -63,38 +69,25 @@ const useLangDetection = () => {
     initializeLanguageDetector();
   }, []);
 
-  // The main detection function
   const detectLanguage = useCallback(
     async (text: string): Promise<string> => {
-      if (!text.trim()) {
-        return "";
-      }
-
-      if (error) {
-        throw new Error(error);
-      }
-
-      if (!detector) {
-        throw new Error("Language detector not initialized");
-      }
+      if (!text.trim()) return "";
+      if (!detector) throw new Error("Language detector is not initialized");
 
       try {
-        const detectedLanguage = await detector.detect(text);
-        return detectedLanguage[0].detectedLanguage;
+        const detected = await detector.detect(text);
+        return detected[0]?.detectedLanguage ?? "";
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Language detection failed";
-        console.error("Language detection error:", err);
-        throw new Error(errorMessage);
+        toast.error("Language detection failed.");
+        throw new Error(err instanceof Error ? err.message : "Unknown error");
       }
     },
-    [detector, error],
+    [detector],
   );
 
   return {
     detectLanguage,
     isInitializing,
-    error,
     isReady: !!detector && !isInitializing,
   };
 };

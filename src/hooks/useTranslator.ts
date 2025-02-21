@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import useLangDetection from "./useLangDetection";
+import { toast } from "sonner";
 
 interface TranslatorResult {
   content: string;
@@ -11,56 +12,48 @@ const useTranslator = () => {
 
   const translate = useCallback(
     async (text: string, targetLanguage: string): Promise<TranslatorResult> => {
-      // Check if API is available
+      //@ts-ignore
       if (typeof window === "undefined" || !window.ai?.translator) {
+        toast.error("Translation API is unavailable.");
         return { content: "", error: "Translator API is not available" };
       }
 
       try {
-        // Detect source language
-          const sourceLanguage = await detectLanguage(text);
-          // console.log('detected lang', sourceLanguage)
-
-        // Check capabilities
+        const sourceLanguage = await detectLanguage(text);
+        //@ts-ignore
         const capabilities = await window.ai.translator.capabilities();
         const available = await capabilities.languagePairAvailable(
           sourceLanguage,
           targetLanguage,
-          );
-          
-          console.log("Available pair translation", available)
+        );
 
         if (available === "no") {
+          toast.error(
+            `Translation from ${sourceLanguage} to ${targetLanguage} is unavailable.`,
+          );
           return {
             content: "",
             error: `Translation from ${sourceLanguage} to ${targetLanguage} is not available.`,
           };
         }
 
-        // Create translator instance
+        //@ts-ignore
         const translatorInstance = await window.ai.translator.create({
           sourceLanguage,
           targetLanguage,
           ...(available === "after-download" && {
             monitor(m: EventTarget) {
-                  m.addEventListener("downloadprogress", (e: any) => {
-                  console.log('downloading')
-                console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
+              m.addEventListener("downloadprogress", (e: any) => {
+                console.log(`Downloading: ${e.loaded} / ${e.total} bytes.`);
               });
             },
           }),
         });
 
-        // Wait for translator to be ready if needed
-        // if (available === "after-download") {
-        //   await translatorInstance.ready;
-        // }
-
-        // Perform translation
         const translatedText = await translatorInstance.translate(text);
-
         return { content: translatedText };
       } catch (err) {
+        toast.error("Translation failed. Try again.");
         return {
           content: "",
           error: err instanceof Error ? err.message : "Translation failed",

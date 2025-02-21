@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 
 type DownloadProgressEvent = {
   loaded: number;
@@ -7,68 +8,67 @@ type DownloadProgressEvent = {
 
 const useSummarizer = () => {
   const [isInitializing, setIsInitializing] = useState(false);
+
   const initializeSummarizer = useCallback(async () => {
-    const options = {
-      // sharedContext: message,
-      type: "key-points",
-      format: "markdown",
-      length: "medium",
-    };
-
-    console.log("initializing");
-
-    const capabilities = await window.ai.summarizer.capabilities();
-    const available = capabilities.available;
-
-    if (available === "no") {
-      throw new Error("Summarizer is not available on this device");
+    //@ts-ignore
+    if (typeof window === "undefined" || !window.ai?.summarizer) {
+      toast.error("Summarizer API is unavailable.");
+      throw new Error("Summarizer API is not available");
     }
 
-    const summarizerInstance = await window.ai!.summarizer.create(options);
+    try {
+      //@ts-ignore
+      const capabilities = await window.ai.summarizer.capabilities();
+      if (capabilities.available === "no") {
+        toast.error("Summarizer is not available on this device.");
+        throw new Error("Summarizer is not available on this device");
+      }
 
-    if (available === "after-download") {
-      summarizerInstance.addEventListener(
-        "downloadprogress",
-        (e: DownloadProgressEvent) => {
-          const progress = Math.round((e.loaded / e.total) * 100);
-          console.log(`Downloading summarizer: ${progress}%`);
-        },
+      //@ts-ignore
+      const summarizerInstance = await window.ai.summarizer.create({
+        type: "key-points",
+        format: "markdown",
+        length: "medium",
+      });
+
+      if (capabilities.available === "after-download") {
+        summarizerInstance.addEventListener(
+          "downloadprogress",
+          (e: DownloadProgressEvent) => {
+            console.log(
+              `Downloading summarizer: ${Math.round((e.loaded / e.total) * 100)}%`,
+            );
+          },
+        );
+        await summarizerInstance.ready;
+      }
+
+      return summarizerInstance;
+    } catch (err) {
+      toast.error("Failed to initialize summarizer.");
+      throw new Error(
+        err instanceof Error ? err.message : "Initialization failed",
       );
-      await summarizerInstance.ready;
     }
-
-    return summarizerInstance;
   }, []);
 
   const summarize = useCallback(
     async (message: string) => {
-      if (typeof window === "undefined" || !window.ai?.summarizer) {
-        return { content: "", error: "Summarizer API is not available" };
-      }
-
-      if (!message.trim()) {
-        return {
-          content: "",
-          error: "No text provided for summarization",
-        };
-      }
+      if (!message.trim())
+        return { content: "", error: "No text provided for summarization" };
 
       setIsInitializing(true);
 
       try {
         const summarizer = await initializeSummarizer();
         const summary = await summarizer.summarize(message);
-
-        console.log(summary);
-
         return { content: summary };
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Failed to generate summary";
-
+      } catch (err) {
+        toast.error("Summarization failed.");
         return {
           content: "",
-          error: errorMessage,
+          error:
+            err instanceof Error ? err.message : "Failed to generate summary",
         };
       } finally {
         setIsInitializing(false);

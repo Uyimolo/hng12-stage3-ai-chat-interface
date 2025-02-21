@@ -27,46 +27,36 @@ const Button = ({
   icon,
 }: ButtonProps) => {
   const variantStyles = {
-    primary: "bg-blue text-white disabled:bg-lighterblue hover:bg-lightblue",
+    primary:
+      "bg-userMessage text-white hover:bg-[#0C8B66] disabled:bg-[#0C8B66]/50 dark:hover:bg-white/80",
     secondary:
-      "bg-white disabled:bg-lightgray/50 disabled:border-lighterblue hover:bg-lighterblue border-[1px] border-blue text-blue hover:light disabled:text-lighterblue",
-    ghost: "bg-transparent hover:bg-lighterBlue hover:text-lightgray",
-    danger: "border-red border text-red hover:bg-red/20 bg-red/10",
+      "bg-lightBackground text-textLight border border-inputBorder hover:bg-hover/10 dark:hover:bg-white/80 disabled:bg-lightBackground/50 disabled:text-textSecondary",
+    danger: "bg-red text-white hover:bg-[#C53030] disabled:bg-[#C53030]/50",
+    ghost: "bg-transparent text-textSecondary hover:bg-hover/20",
     tertiary:
-      "bg-white disabled:bg-lightgray/50  hover:bg-lighterblue border-[1px] border-lightblue hover:text-white text-blue disabled:text-lighterblue px-2 py-2 text-xs font-normal",
+      "bg-white text-darkbackground border border-inputBorder hover:bg-hover/10 dark:hover:bg-white/80 disabled:bg-lightBackground/50 disabled:text-textSecondary px-2 py-2 text-xs",
   };
 
-  // Default to 'danger' if the variant doesn't match any of the above
-  const buttonClass = variantStyles[variant] || variantStyles.danger;
-
+  const buttonClass = variantStyles[variant] || variantStyles.primary;
   const Icon = icon;
+
   return (
     <button
       type={type}
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "flex w-fit items-center justify-center gap-2 rounded-md px-7 py-3 text-sm font-semibold",
+        "flex w-fit items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition duration-200",
         buttonClass,
+        disabled && "cursor-not-allowed opacity-50",
         className,
       )}
     >
       {loading ? (
-        <FaSpinner className={cn("animate-spin text-xl", iconClassName)} /> // if loading show animated loading spinner icon
+        <FaSpinner className={cn("animate-spin text-lg", iconClassName)} />
       ) : Icon ? (
-        <Icon
-          className={cn(
-            "text-xl",
-            variant === "primary" && "text-white",
-            variant === "secondary" && "text-blue",
-            variant === "ghost" && "text-gray",
-            variant === "danger" && "text-red",
-            iconClassName,
-          )}
-        /> // if not loading and icon is provided show icon
-      ) : (
-        <></> // show nothing
-      )}
+        <Icon className={cn("text-lg", iconClassName)} />
+      ) : null}
       {children}
     </button>
   );

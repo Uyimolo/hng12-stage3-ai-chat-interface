@@ -1,5 +1,5 @@
 import useLangDetection from "@/hooks/useLangDetection";
-import { cn, getLanguageDisplayName, scrollToBottom } from "@/lib/utils";
+import { cn, getLanguageDisplayName } from "@/lib/utils";
 import { Message } from "@/types/types";
 import { ChangeEvent, FormEvent, useState, useCallback } from "react";
 import { IoMdSend } from "react-icons/io";
@@ -7,9 +7,11 @@ import { IoMdSend } from "react-icons/io";
 const InputArea = ({
   setMessages,
   messages,
+  setShouldScroll,
 }: {
   messages: Message[];
   setMessages: (newMessages: Message[]) => void;
+  setShouldScroll: (shouldScroll: boolean) => void;
 }) => {
   const [text, setText] = useState("");
   const { detectLanguage, error, isReady } = useLangDetection();
@@ -54,7 +56,7 @@ const InputArea = ({
       e.preventDefault();
 
       if (!text.trim()) return;
-
+      setShouldScroll(true);
       const newMessage = createNewMessage(text.trim());
 
       // Create new messages array with the new message
@@ -63,7 +65,11 @@ const InputArea = ({
         : [newMessage];
       setMessages(updatedMessages);
 
-      scrollToBottom();
+      // scrollToBottom("message-feed");
+      document.getElementById("message-feed")?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
       setText("");
 
       // Detect language and update messages array
@@ -94,7 +100,7 @@ const InputArea = ({
     <form
       onSubmit={(e) => sendMessage(text, e)}
       className={cn(
-        "absolute bottom-4 left-1/2 h-32 w-[calc(100vw-32px)] max-w-[718px] -translate-x-1/2 rounded-3xl border border-lightgray bg-white p-4 shadow-lg shadow-black/30 transition-all duration-500 md:w-4/5",
+        "absolute bottom-4 left-1/2 h-28 w-[calc(100vw-32px)] max-w-[718px] -translate-x-1/2 rounded-3xl border border-lightgray bg-white p-4 shadow-lg shadow-black/30 transition-all duration-500 md:w-4/5 xl:max-w-[980px]",
         !messages.length && "top-1/2 -translate-y-1/2",
       )}
     >
@@ -109,7 +115,7 @@ const InputArea = ({
             : "Initializing language detector..."
         }
         disabled={!isReady}
-        className="mx-auto h-24 w-[calc(100%-20px)] resize-none rounded text-sm placeholder:text-sm focus:outline-none disabled:bg-transparent"
+        className="text-textLight mx-auto h-20 w-[calc(100%-24px)] resize-none rounded text-sm placeholder:text-sm focus:outline-none disabled:bg-transparent"
       ></textarea>
 
       {/* actions */}
@@ -121,7 +127,7 @@ const InputArea = ({
         </div>
         <button className="" disabled={!isReady || !text.trim()}>
           <IoMdSend
-            className={`text-2xl ${isReady ? "text-blue" : "text-gray-400"}`}
+            className={`text-2xl ${isReady ? "text-textLight" : "text-textLight"}`}
           />
         </button>
       </div>

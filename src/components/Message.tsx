@@ -9,11 +9,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { useState } from "react";
+
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
+
+import { useEffect, useRef, useState } from "react";
 import useTranslator from "@/hooks/useTranslator";
 import useSummarizer from "@/hooks/useSummarizer";
 import { Message as MessageType, Translation } from "@/types/types";
 import { getLanguageDisplayName } from "@/lib/utils";
+import { toast } from "sonner";
 
 const LANGUAGES = [
   { label: "English", value: "en" },
@@ -29,14 +40,38 @@ const Message = ({
   message,
   setMessages,
   messages,
+  setShouldScroll,
 }: {
   message: MessageType;
   messages: MessageType[];
   setMessages: (newMessages: MessageType[]) => void;
+  setShouldScroll: (shouldScroll: boolean) => void;
 }) => {
   const { translate } = useTranslator();
   const { summarize } = useSummarizer();
   const [selectedLang, setSelectedLang] = useState(LANGUAGES[0].value);
+
+  const lastTransRef = useRef<HTMLDivElement | null>(null);
+
+  const summaryRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (lastTransRef.current) {
+      lastTransRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [message.translations]);
+
+  useEffect(() => {
+    if (summaryRef.current) {
+      summaryRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [message.summarizedText]);
 
   const {
     id,
@@ -47,6 +82,7 @@ const Message = ({
   } = message;
 
   const removeMessage = (messageId: string) => {
+    setShouldScroll(false);
     const updatedMessages = messages.filter((msg) => msg.id !== messageId);
     setMessages(updatedMessages);
   };
@@ -108,7 +144,12 @@ const Message = ({
   };
 
   const handleTranslation = async () => {
-    if (selectedLang === detectedLanguage.languageCode) return;
+    if (selectedLang === detectedLanguage.languageCode) {
+      toast.info("Cannot translate to same language");
+      return;
+    }
+
+    setShouldScroll(false);
 
     // Check for existing valid translation
     const existingTranslation = getExistingTranslation(
@@ -155,13 +196,15 @@ const Message = ({
   };
 
   const summarizeText = async () => {
+    setShouldScroll(false);
+
     const summary = await summarize(userPrompt);
     const updatedMessages = messages.map((msg) =>
       msg.id === id
         ? {
             ...msg,
             summarizedText: {
-              content: summary.content,
+              content: summary.content || summary.error,
               timestamp: new Date().toISOString(),
             },
           }
@@ -173,19 +216,28 @@ const Message = ({
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-12">
       {/* User Message */}
-      <div className="w-[90%] self-end">
-        <div className="w-full max-w-[400px] justify-self-end rounded-xl border bg-lightergray p-2 hover:border-lighterblue">
+      <div className="group flex w-[95%] items-start justify-end gap-1 self-end md:gap-2">
+        <button
+          className="lg:hidden lg:group-hover:block"
+          onClick={() => removeMessage(id)}
+        >
+          <FaTrash className="justify-self-end text-sm text-white" />
+        </button>
+        <div className="hover:border-lighterblue w-full max-w-[400px] justify-self-end rounded-xl border border-transparent bg-darkbackground/10 p-2 dark:bg-lightBackground/10">
           <Paragraph className="text-darkgray">{userPrompt}</Paragraph>
           <div className="flex justify-end">
             {detectedLanguage && (
-              <Paragraph variant="small" className="text-right text-darkgray">
+              <Paragraph
+                variant="small"
+                className="text-lightblue mt-2 text-right"
+              >
                 Language: {detectedLanguage.name}
               </Paragraph>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap items-center gap-1 pt-2">
+          <div className="flex w-full flex-wrap items-center gap-1 pt-2">
             {userPrompt.length > 150 &&
               detectedLanguage.name.toLowerCase() === "english" && (
                 <Button onClick={summarizeText} variant="tertiary">
@@ -198,9 +250,9 @@ const Message = ({
             </Button>
 
             <Select onValueChange={setSelectedLang}>
-              <SelectTrigger className="h-[34px] min-w-28 max-w-fit border-lightblue bg-white p-1 text-xs text-blue hover:bg-lighterblue hover:text-white">
+              <SelectTrigger className="h-[34px] min-w-28 max-w-fit gap-1 border-darkbackground bg-white p-1 text-xs font-medium text-textLight hover:bg-hover/10 dark:hover:bg-white/80">
                 <BsTranslate className="text-sm" />
-                <SelectValue placeholder="Select Language" />
+                <SelectValue placeholder={LANGUAGES[0].label} />
               </SelectTrigger>
               <SelectContent>
                 {LANGUAGES.map((lang) => (
@@ -215,21 +267,27 @@ const Message = ({
       </div>
 
       {/* AI Responses */}
-      <div className="w-full space-y-4">
+      <div className="w-[95%] space-y-4">
         {summarizedText?.content && (
-          <div className="max-w-[400px] rounded-xl border bg-lighterblue/30 p-2 hover:border-lightblue">
-            <Paragraph>{`Summary:`}</Paragraph>
+          <div
+            ref={summaryRef}
+            className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/10 p-2 dark:bg-lightBackground/10"
+          >
+            <Paragraph>{`Here's your summarized text:`}</Paragraph>
             <Paragraph>{summarizedText.content}</Paragraph>
           </div>
         )}
         {translations.length > 0 &&
-          translations.map(({ language, content, timestamp }) => (
+          translations.map((translation, index) => (
             <div
-              key={timestamp}
-              className="max-w-[400px] rounded-xl border bg-lighterblue/20 p-2 hover:border-lightblue"
+              ref={index === translations.length - 1 ? lastTransRef : null}
+              key={index}
+              className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/10 p-2 dark:bg-lightBackground/10"
             >
-              <Paragraph>{`Sure here's your message in ${getLanguageDisplayName(language)}:`}</Paragraph>
-              <Paragraph className="text-darkgray">{content}</Paragraph>
+              <Paragraph>{`Sure here's your translation in ${getLanguageDisplayName(translation.language)}:`}</Paragraph>
+              <Paragraph className="text-darkgray">
+                {translation.content}
+              </Paragraph>
             </div>
           ))}
       </div>
