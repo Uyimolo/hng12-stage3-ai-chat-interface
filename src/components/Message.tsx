@@ -271,7 +271,7 @@ const Message = ({
         {summarizedText?.content && (
           <div
             ref={summaryRef}
-            className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/10 p-2 dark:bg-lightBackground/10"
+            className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/20 p-2 dark:bg-lightBackground/20"
           >
             <Paragraph>{`Here's your summarized text:`}</Paragraph>
             <Paragraph>{summarizedText.content}</Paragraph>
@@ -282,7 +282,7 @@ const Message = ({
             <div
               ref={index === translations.length - 1 ? lastTransRef : null}
               key={index}
-              className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/10 p-2 dark:bg-lightBackground/10"
+              className="hover:border-lightblue max-w-[400px] space-y-3 rounded-xl border border-transparent bg-darkbackground/20 p-2 dark:bg-lightBackground/20"
             >
               <Paragraph>{`Sure here's your translation in ${getLanguageDisplayName(translation.language)}:`}</Paragraph>
               <Paragraph className="text-darkgray">
